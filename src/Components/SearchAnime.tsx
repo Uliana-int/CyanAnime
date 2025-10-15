@@ -18,14 +18,14 @@ export default function SearchAnime({ onSearch }: SearchAnimeProps) {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search anime..."
+        placeholder="Let's search anime!"
         className="bg-blue-50 rounded-2xl w-full max-w-2xl p-3 text-black"
       />
       <button
         type="submit"
         className="bg-yellow-600 rounded-2xl p-3 font-bold whitespace-nowrap"
       >
-        Search
+        Search!
       </button>
     </form>
   );
