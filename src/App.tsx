@@ -18,10 +18,13 @@ export default function App() {
     }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold text-center my-6">Bleach Anime Collection</h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50 text-slate-800 font-sans">
+      <div className='max-w-6xl mx-auto px-4 py-8'>
+      <h1 className="text-4xl md:text-5xl font-bold text-center mb-10 text-cyan-700 tracking-tight">Anime Collection</h1>
+      
       <SearchAnime onSearch={handleSearch} />
-      <div className="flex flex-col items-center">
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
         {filteredAnime.length > 0 ? (
           filteredAnime.map((anime) => (
             <AnimeCard
@@ -30,8 +33,9 @@ export default function App() {
             />
           ))
         ) : (
-          <p className="text-xl mt-10">No anime found...</p>
+          <p className="text-xl text-center text-slate-500 col-span-full mt-10">No anime found...</p>
         )}
+      </div>
       </div>
     </div>
   );

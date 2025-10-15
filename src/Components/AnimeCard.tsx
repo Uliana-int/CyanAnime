@@ -4,16 +4,22 @@ interface AnimeCardProps { anime: Anime}
 
 export default function AnimeCard({ anime }: AnimeCardProps) {
   return (
-    <div className="flex flex-col mx-4 border rounded-2xl p-4 mb-6 pb-20 bg-purple-900 text-white max-w-4xl">
-      <h2 className="text-2xl font-bold mb-2">{anime.title}</h2>
-      <div className="flex flex-col md:flex-row gap-4">
+    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-slate-200">
+      
+      <div className="relative">
         <img
-          className="rounded-2xl w-full md:w-64 h-auto object-cover"
+          className="w-full h-48 object-cover"
           src={anime.images.jpg.image_url}
           alt={anime.title}
         />
-        <p className="text-sm md:text-base flex-1">{anime.synopsis}</p>
       </div>
+
+    <div className="p-5 flex flex-col flex-grow">
+    <h2 className="text-xl font-bold text-slate-800 mb-2 line-clamp-1">{anime.title}</h2>
+    <p className="text-slate-600 text-sm line-clamp-3 flex-grow">
+      {anime.synopsis}
+      </p>
+    </div>
     </div>
   );
 }
