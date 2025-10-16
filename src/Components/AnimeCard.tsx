@@ -17,7 +17,7 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
     <div className="p-5 flex flex-col flex-grow">
     <h2 className="text-xl font-bold text-slate-800 mb-2 line-clamp-1">{anime.title}</h2>
     <p className="text-slate-600 text-sm line-clamp-3 flex-grow">
-      {anime.synopsis}
+      {anime.synopsis || 'No synopsis available :('}
       </p>
     </div>
     </div>

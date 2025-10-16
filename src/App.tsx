@@ -26,7 +26,7 @@ export default function App() {
       const result: JikanResponse = await response.json()
       setFilteredAnime(result.data.slice(0, 20)) // want to take first 20
     } catch (err) {
-      setError(err.message)
+      setError(( err as Error).message)
       console.error(err)
     } finally {
       setLoading(false)
@@ -47,7 +47,7 @@ export default function App() {
       const result: JikanResponse = await response.json()
       setFilteredAnime(result.data.slice(0, 20))
     } catch (err) {
-      setError(err.message)
+      setError(( err as Error).message)
       console.error(err)
     } finally {
       setLoading(false)
@@ -57,7 +57,6 @@ export default function App() {
   useEffect(() => {
     fetchTopAnime()
   }, []);
-
 
 
   return (

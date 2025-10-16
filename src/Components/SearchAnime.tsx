@@ -30,7 +30,7 @@ export default function SearchAnime({ onSearch }: SearchAnimeProps) {
             transition-all duration-300 ease-in-out
             ${isFocused ? 'shadow-lg scale-[1.02]' : 'shadow-md'}
             focus:outline-none
-            `}      />
+            `}/>
 
             
       <button
