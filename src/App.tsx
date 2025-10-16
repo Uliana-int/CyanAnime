@@ -1,21 +1,64 @@
-import { useState} from 'react';
+import { useState, useEffect} from 'react';
 import AnimeCard from './Components/AnimeCard';
 import SearchAnime from './Components/SearchAnime';
-import allAnimeData from './data/all-anime.json';
-import type { Anime, AnimeApiResponse} from './types/index'
-import { filterAnime } from './utils/filterAnime'
+import type { Anime } from './types/index'
 
 
-const initialData = allAnimeData as AnimeApiResponse;
+interface JikanResponse {
+  data: Anime[]
+}
 
 export default function App() {
-  const animeList = initialData.data
-  const [filteredAnime, setFilteredAnime] = useState<Anime[]>(initialData.data)
+  
+  const [filteredAnime, setFilteredAnime] = useState<Anime[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSearch = (query: string) => {
-    const result = filterAnime(animeList, query)
-    setFilteredAnime(result)
+
+
+
+  const fetchTopAnime = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await fetch('https://api.jikan.moe/v4/anime')
+      if (!response.ok) throw new Error('Failg to fetch top anime :(')
+      const result: JikanResponse = await response.json()
+      setFilteredAnime(result.data.slice(0, 20)) // want to take first 20
+    } catch (err) {
+      setError(err.message)
+      console.error(err)
+    } finally {
+      setLoading(false)
+    };
+  }
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      fetchTopAnime()
+      return
     }
+
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}`)
+      if (!response.ok) throw new Error('Search faild :(')
+      const result: JikanResponse = await response.json()
+      setFilteredAnime(result.data.slice(0, 20))
+    } catch (err) {
+      setError(err.message)
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  };
+
+  useEffect(() => {
+    fetchTopAnime()
+  }, []);
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50 text-slate-800 font-sans">
@@ -29,18 +72,26 @@ export default function App() {
       </div>
       <SearchAnime onSearch={handleSearch} />
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-        {filteredAnime.length > 0 ? (
-          filteredAnime.map((anime) => (
-            <AnimeCard
-              key={anime.mal_id}
-              anime = {anime}
-            />
-          ))
+      {error && <p className="text-red-500 text-center my-4">Error: {error}</p>}
+
+     {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-600"></div>
+          </div>
         ) : (
-          <p className="text-xl text-center text-slate-500 col-span-full mt-10">No anime found...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+            {filteredAnime.length > 0 ? (
+              filteredAnime.map((anime) => (
+                <AnimeCard
+                  key={anime.mal_id}
+                  anime={anime}
+                />
+              ))
+            ) : (
+              <p className="text-xl text-center text-slate-500 col-span-full mt-10">No anime found...</p>
+            )}
+          </div>
         )}
-      </div>
       </div>
     </div>
   );

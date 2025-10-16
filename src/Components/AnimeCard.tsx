@@ -8,7 +8,7 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
       
       <div className="relative">
         <img
-          className="w-full h-48 object-cover"
+          className="w-full h-full object-cover"
           src={anime.images.jpg.image_url}
           alt={anime.title}
         />
