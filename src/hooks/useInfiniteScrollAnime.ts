@@ -24,12 +24,14 @@ export const useInfiniteScrollAnime = () => {
         setLoading(true);
         let url;
         if (query) {
-          url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(
+          url = `http://localhost:5000/api/jikan/v4/anime?q=${encodeURIComponent(
             query
           )}&page=${pageNum}&limit=${ITEMS_PER_PAGE}`;
         } else {
-          url = `https://api.jikan.moe/v4/anime?order_by=score&sort=desc&page=${pageNum}&limit=${ITEMS_PER_PAGE}`;
+          url = `http://localhost:5000/api/jikan/v4/anime?order_by=score&sort=desc&page=${pageNum}&limit=${ITEMS_PER_PAGE}`;
         }
+
+        console.log(`Fetching from proxy: ${url}`)
 
         const res = await fetch(url);
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
@@ -51,11 +53,7 @@ export const useInfiniteScrollAnime = () => {
   );
 
   const loadMore = useCallback(async () => {
-    console.log("loadMore вызвана")
-    if (loading || !hasMore) {
-        console.log("loadMore: условия не выполнены", { loading, hasMore })
-        return
-    }
+    if (loading || !hasMore) return
     
 
     const nextPage = page + 1;
