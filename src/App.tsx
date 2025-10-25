@@ -1,67 +1,30 @@
-import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import AnimeCard from "./Components/AnimeCard";
 import SearchAnime from "./Components/SearchAnime";
 import AnimeDetail from "./Components/AnimeDetail";
+import { useInfiniteScrollAnime } from "./hooks/useInfiniteScrollAnime";
+import { useCallback, useRef } from "react";
 import type { Anime } from "./types/index";
-import { shuffleArray } from "./utils/shuffleArray";
 
-
-
-interface JikanResponse {
-  data: Anime[];
-}
 
 export default function App() {
-  const [filteredAnime, setFilteredAnime] = useState<Anime[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { displayedAnime, loading, hasMore, loadMore, handleSearch } = useInfiniteScrollAnime();
 
-  const fetchTopAnime = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch("https://api.jikan.moe/v4/anime");
-      if (!response.ok) throw new Error("Failg to fetch top anime :(");
-      const result: JikanResponse = await response.json();
-      
-      const shuffleData = shuffleArray(result.data)
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastAnimeRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMore();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, loadMore]
+  );
 
-      setFilteredAnime(shuffleData.slice(0, 20)); // want to take first 20
-    } catch (err) {
-      setError((err as Error).message);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async (query: string) => {
-    if (!query.trim()) {
-      fetchTopAnime();
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch(
-        `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}`
-      );
-      if (!response.ok) throw new Error("Search faild :(");
-      const result: JikanResponse = await response.json();
-      setFilteredAnime(result.data.slice(0, 20));
-    } catch (err) {
-      setError((err as Error).message);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTopAnime();
-  }, []);
 
   return (
     <Routes>
@@ -81,20 +44,20 @@ export default function App() {
               </div>
               <SearchAnime onSearch={handleSearch} />
 
-              {error && (
-                <p className="text-red-500 text-center my-4">Error: {error}</p>
-              )}
-
-              {loading ? (
+                {loading && displayedAnime.length === 0 ? (
                 <div className="flex justify-center items-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-600"></div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-                  {filteredAnime.length > 0 ? (
-                    filteredAnime.map((anime) => (
-                      <AnimeCard key={anime.mal_id} anime={anime} />
-                    ))
+                  {displayedAnime.length > 0 ? (
+                    displayedAnime.map((anime: Anime, index: number) => {
+                      if (displayedAnime.length === index + 1) {
+                        return <AnimeCard key={anime.mal_id} ref={lastAnimeRef} anime={anime} />;
+                      } else {
+                        return <AnimeCard key={anime.mal_id} anime={anime} />;
+                      }
+                    })
                   ) : (
                     <p className="text-xl text-center text-slate-500 col-span-full mt-10">
                       No anime found...

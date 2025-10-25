@@ -1,14 +1,16 @@
+import { forwardRef } from "react";
 import type { Anime } from "../types/index";
 import { Link } from "react-router-dom";
 
 interface AnimeCardProps {
-  anime: Anime;
+  anime: Anime
 }
 
-export default function AnimeCard({ anime }: AnimeCardProps) {
+const AnimeCard = forwardRef<HTMLDivElement, AnimeCardProps>(({ anime }, ref) => {
   const imageUrl = anime.images?.jpg?.image_url;
 
-  return (
+return (
+    <div ref={ref}>
     <Link
       to={`/anime/${anime.mal_id}`}
       className="block bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-slate-200"
@@ -18,6 +20,7 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
           className="w-full h-full object-cover"
           src={imageUrl || "https://placehold.co/300x400?text=No+Image"}
           alt={anime.title}
+          loading="lazy"
         />
 
         {anime.score !== undefined && anime.score !== null && (
@@ -36,5 +39,8 @@ export default function AnimeCard({ anime }: AnimeCardProps) {
         </p>
       </div>
     </Link>
-  );
-}
+    </div>
+  )
+})
+
+export default AnimeCard;
